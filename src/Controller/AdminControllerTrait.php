@@ -898,6 +898,8 @@ trait AdminControllerTrait
      * @param array  $arguments         The arguments passed to the executed method
      *
      * @return mixed
+     *
+     * @throws \Exception
      */
     protected function executeDynamicMethod($methodNamePattern, array $arguments = [])
     {
@@ -905,6 +907,13 @@ trait AdminControllerTrait
 
         if (!\is_callable([$this, $methodName])) {
             $methodName = str_replace('<EntityName>', '', $methodNamePattern);
+        }
+
+        if (!\method_exists($this, $methodName)) {
+            throw new \BadMethodCallException(sprintf(
+                'The %s method not exists in %s class',
+                $methodName, \get_class($this)
+            ));
         }
 
         return \call_user_func_array([$this, $methodName], $arguments);
